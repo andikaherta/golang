@@ -1,69 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css"
-          integrity="sha384-SI27wrMjH3ZZ89r4o+fGIJtnzkAnFs3E4qz9DIYioCQ5l9Rd/7UAa8DHcaL8jkWt" crossorigin="anonymous">
-    <title>Todo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.js"></script>
+    <title>Tugas Golang</title>
 </head>
 
 <body>
-    <div style="text-align: center;"><h1>Todos</h1></div>
-
-    <div class="container">
-        <div class="card">
-            <div class="card-header">Add a task</div>
-            <div class="card-body">
-                <form action="/add" method="post">
-                    <div class="form-group">
-                        <label for="Item">Item</label>
-                        <input type="text" class="form-control" name="item" placeholder="What do you want to do?">
-                        <small class="form-text text-muted">Enter what you want to procastinate 🙂</small>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
-        </div>
-    </div>
+    <div style="text-align: center;"><h1>Todos Task - Golang / Digitalent</h1></div>
     &nbsp;
+    <div class="container">
+        <button type="button" class="btn btn-success" onclick="addData(this);">
+            Add a task
+        </button>  
+    </div>
     &nbsp;
     <div class="container">
         <div class="card">
             <div class="card-header">Tasks</div>
             <div class="card-body">
-                <table class="table table-borderless">
-                    <thead>
-                    <tr>
-                        <th scope="col">Item</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {{range .Todos}}
-                        {{if .Completed}}
-                            <tr>
-                                <td><strike>{{.Item}}</strike></td>
-                                <td>Completed</td>
-                                <td>
-                                    <button class="btn btn-primary" disabled>Complete</button>
-                                    <button class="btn btn-danger" disabled>Delete</button>
-                                </td>
-                            </tr>
-                        {{else}}
-                            <tr>
-                                <td>{{.Item}}</td>
-                                <td>Not Completed</td>
-                                <td>
-                                    <a href="/complete/{{ .Id}}"><button class="btn btn-primary">Complete</button></a>
-                                    <a href="/delete/{{ .Id}}"><button class="btn btn-danger">Delete</button></a>
-                                </td>
-                            </tr>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col" style="width:50%;">Task</th>
+                            <th scope="col">Assignee</th>
+                            <th scope="col">Deadline</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range .Todos}}
+                            {{if .Completed}}
+                                <tr>
+                                    <td><strike>{{.Item}}</strike></td>
+                                    <td><strike>{{.Assignee}}</strike></td>
+                                    <td><strike>{{.Deadline}}</strike></td>
+                                    <td>Completed</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm" disabled>Complete</button>
+                                        <a href="/delete/{{ .Id}}"><button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i></button></a>
+                                    </td>
+                                </tr>
+                            {{else}}
+                                <tr>
+                                    <td>{{.Item}}</td>
+                                    <td>{{.Assignee}}</td>
+                                    <td>{{.Deadline}}</td>
+                                    <td>Not Completed</td>
+                                    <td>
+                                        <a href="/complete/{{ .Id}}"><button class="btn btn-primary btn-sm">Complete</button></a>
+                                        <button type="button" onclick="editData(this);" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
+                                        <a href="/delete/{{ .Id}}"><button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i></button></a>
+                                    </td>
+                                    <td style="display:none;">{{.Id}}</td>
+                                </tr>
+                            {{end}}
                         {{end}}
-                    {{end}}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+    &nbsp;
+    &nbsp;
+    
+    <div class="modal fade" id="form" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="exampleModalLabel">Create Task</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/add" method="post" autocomplete="off">
+                <div class="modal-body">
+                <div class="form-group">
+                    <label for="email1">Task Detail</label>
+                    <input type="hidden" class="form-control" name="id" id="id">
+                    <input type="item" class="form-control" name="item" id="item" placeholder="What do you want to do?">
+                </div>
+                <div class="form-group">
+                    <label for="assignee">Assignee</label>
+                    <input type="assignee" class="form-control" name="assignee" id="assignee" >
+                </div>
+                <div class="form-group">
+                    <label for="deadline">Deadline</label>
+                    <input type="deadline" class="form-control" name="deadline" id="deadline" >
+                </div>
+                </div>
+                <div class="modal-footer border-top-0 d-flex justify-content-center">
+                <button type="submit" class="btn btn-success">Submit</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+    &nbsp;
+    &nbsp;
 </body>
+<script>
+    $(document).ready(function() {
+        $('#deadline').datepicker({
+            dateFormat: 'dd-mm-yy'
+        });
+
+        $('[data-toggle="tooltip"]').tooltip(); 
+    });
+
+    function addData(ctl) {
+        $('#form').modal('show');
+        $('form').attr('action', '/add');
+        $("#item").val("");
+        $("#assignee").val("");
+        $("#deadline").val("");
+        $("#id").val("");
+    }
+
+    function editData(ctl) {
+        var row = $(ctl).parents("tr");
+        var cols = row.children("td");
+
+        $("#exampleModalLabel").text("Edit Task");
+
+        $('form').attr('action', '/edit');
+
+        $("#item").val($(cols[0]).text());
+        $("#assignee").val($(cols[1]).text());
+        $("#deadline").val($(cols[2]).text());
+        $("#id").val($(cols[5]).text());
+
+        $('#form').modal('show');
+    }
+    
+</script>
 </html>
+
+

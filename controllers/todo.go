@@ -2,16 +2,19 @@ package controllers
 
 import (
 	"fmt"
+	"html/template"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/ichtrojan/go-todo/config"
 	"github.com/ichtrojan/go-todo/models"
-	"html/template"
-	"net/http"
 )
 
 var (
 	id        int
 	item      string
+	assignee  string
+	deadline  string
 	completed int
 	view      = template.Must(template.ParseFiles("./views/index.html"))
 	database  = config.Database()
@@ -27,7 +30,7 @@ func Show(w http.ResponseWriter, r *http.Request) {
 	var todos []models.Todo
 
 	for statement.Next() {
-		err = statement.Scan(&id, &item, &completed)
+		err = statement.Scan(&id, &item, &assignee, &deadline, &completed)
 
 		if err != nil {
 			fmt.Println(err)
@@ -36,6 +39,8 @@ func Show(w http.ResponseWriter, r *http.Request) {
 		todo := models.Todo{
 			Id:        id,
 			Item:      item,
+			Assignee:  assignee,
+			Deadline:  deadline,
 			Completed: completed,
 		}
 
@@ -52,8 +57,26 @@ func Show(w http.ResponseWriter, r *http.Request) {
 func Add(w http.ResponseWriter, r *http.Request) {
 
 	item := r.FormValue("item")
+	assignee := r.FormValue("assignee")
+	deadline := r.FormValue("deadline")
 
-	_, err := database.Exec(`INSERT INTO todos (item) VALUE (?)`, item)
+	_, err := database.Exec(`INSERT INTO todos (item, assignee, deadline) VALUE (?,?,?)`, item, assignee, deadline)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	http.Redirect(w, r, "/", 301)
+}
+
+func Edit(w http.ResponseWriter, r *http.Request) {
+
+	item := r.FormValue("item")
+	assignee := r.FormValue("assignee")
+	deadline := r.FormValue("deadline")
+	id := r.FormValue("id")
+
+	_, err := database.Exec(`UPDATE todos SET item = ?, assignee = ?, deadline = ?  WHERE id = ?`, item, assignee, deadline, id)
 
 	if err != nil {
 		fmt.Println(err)
